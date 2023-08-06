@@ -1,0 +1,12 @@
+{
+  "name": "h1bmatch_main",
+  "version": "1.0.0",
+  "description": "This serves as the main web application for H1BMatch.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Yoseph Shibiru, Jyhdel Pamonag",
+  "license": "ISC"
+}
