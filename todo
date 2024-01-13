@@ -1,0 +1,40 @@
+Need MVP:
+    I need the data from DOL to be organized with company and the number of jobs they sponsor and I should be able to call the api to get the data.
+    Import data to AWS done
+    interact with the database through your backend api done
+    modeify the sql to get the approprirte infromation
+    create the api that calls the database from the sraper.
+
+
+    - [ ] This is an unchecked task
+
+
+
+figure out how to structure the data in dynamodb
+currently I will just have a list of jobs with compnay names, 
+I do have to filter with sponsorship before putting it in the database though 
+I have to make it so that when i recive a job post extract the compnay and put the compnay data, and location data as well
+
+
+
+
+
+The scraper side:
+
+should be robust
+
+Put limits so you don't have to pay!!!
+
+A job collector that runs routinely and saves jobs to the database:
+
+    get the most famous 100 jobs from each state:
+
+
+    Check if the compnay exists in the sponsering companies table then proceed:
+
+    Must be able to avoid similar jobs :
+
+        Match the compnay first and then the job:
+        
+         if redundunt see location if same then skip
+
