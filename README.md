@@ -26,7 +26,7 @@ Install dependencies:
 ### Running the App
 
 Start the application:
-```yarn start```
+```yarn dev```
 
 ## Built With
 
