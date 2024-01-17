@@ -16,6 +16,14 @@ I do have to filter with sponsorship before putting it in the database though
 I have to make it so that when i recive a job post extract the compnay and put the compnay data, and location data as well
 
 
+get an api to collect compnay detials 
+
+upload data from 2021 up to 2023 the database
+index it with compnay name
+
+Make it fast for multithreading.
+
+
 
 
 
@@ -28,7 +36,6 @@ Put limits so you don't have to pay!!!
 A job collector that runs routinely and saves jobs to the database:
 
     get the most famous 100 jobs from each state:
-
 
     Check if the compnay exists in the sponsering companies table then proceed:
 
