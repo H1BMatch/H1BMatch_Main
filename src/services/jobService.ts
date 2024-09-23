@@ -1,38 +1,28 @@
-import axios from 'axios';
-import { getCompanyData } from './companyService';
+// src/services/jobService.ts
 
-export async function getJobsByTitle(title: string) {
-    let i= 0;
-  const TOTAL_JOBS = 10; 
-  const JOBS_PER_PAGE = 20;
-  const encodedTitle = encodeURIComponent(title);
-  const baseUrl = "https://www.indeed.com/rss?q=" + encodedTitle;
-  let allJobs = [];
+import pool from '../utils/RDSConnection';
+import { IJob } from '../models/Job';
+import { QueryResult } from 'pg';
 
-  try {
-    while (allJobs.length < TOTAL_JOBS) {
-     
-      const fullUrl = `${baseUrl}&start=${i}`;
-      console.log(`Fetching jobs from URL: ${fullUrl}`);
-      i += JOBS_PER_PAGE;
-      const scraperResponse = await axios.get(`http://localhost:3002/parseRss?fullUrl=${encodeURIComponent(fullUrl)}`);
-      const jobs = scraperResponse.data;
+export async function getJobsByTitle(title: string): Promise<IJob[]> {
+  const query = 'SELECT * FROM jobs WHERE title ILIKE $1';
+  const values = [`%${title}%`];
 
-      for (const job of jobs) {
-        console.log('Fetching company data for:', job.company);
-        const companyData = await getCompanyData(job.company);
+  const result: QueryResult<IJob> = await pool.query(query, values);
+  return result.rows;
+}
 
-        if (companyData !== null) {
-          job.companyData = companyData;
-          allJobs.push(job);
-        }
-      }
-    }
-    console.log(`Total number of jobs reached: ${TOTAL_JOBS}`);
-    console.log(JSON.stringify(allJobs, null, 2));
-    return allJobs;
-  } catch (error) {
-    console.error('Error fetching job data:', error);
-    return null;
-  }
+export async function getJobsBySimilarity(userId: string): Promise<IJob[]> {
+  // Perform the similarity computation within the database
+  const query = `
+    SELECT *, job_vector <-> (SELECT resume_vector FROM users WHERE user_id = $1) AS distance
+    FROM jobs
+    WHERE job_vector IS NOT NULL
+    ORDER BY distance
+    LIMIT 10;
+  `;
+  const values = [userId];
+
+  const result: QueryResult<IJob & { distance: number }> = await pool.query(query, values);
+  return result.rows;
 }

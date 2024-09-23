@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { QueryResult } from 'pg';
 import { Pool, PoolClient } from 'pg';
+import { registerType } from 'pgvector/pg';
+import * as pg from 'pg';
 
 const pool = new Pool({
     user: process.env.DB_USER,
@@ -14,6 +16,20 @@ const pool = new Pool({
 });
 
 console.log("Attempting to connect to the database...");
+
+pool.on('connect', async (client) => {
+    try {
+      await registerType(client);
+      console.log('Registered vector type with client');
+    } catch (err) {
+      console.error('Error registering vector type:', err);
+    }
+  });
+
+pool.on('error', (err: Error) => {
+  console.error('Unexpected error on idle client', err);
+  process.exit(-1);
+});
 
 pool.connect((err: Error | undefined, client: PoolClient | undefined, done: () => void) => {
     if (err) {
@@ -31,14 +47,6 @@ pool.connect((err: Error | undefined, client: PoolClient | undefined, done: () =
     }
 });
 
-pool.on('connect', () => {
-    console.log('Connected to the database');
-});
-
-pool.on('error', (err : Error) => {
-    console.error('Unexpected error on idle client', err);
-    process.exit(-1);
-});
-
 export default pool;
  
+
