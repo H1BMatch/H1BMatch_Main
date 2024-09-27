@@ -12,12 +12,13 @@
     "@types/node": "^20.7.2",
     "@types/node-cron": "^3.0.11",
     "@types/pg": "^8.10.9",
-    "nodemon": "^3.0.1",
+    "nodemon": "^3.1.7",
     "typescript": "^5.2.2"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.421.0",
     "@aws-sdk/lib-dynamodb": "^3.421.0",
+    "@clerk/clerk-sdk-node": "^5.0.44",
     "@types/express": "^4.17.18",
     "@types/mongoose": "^5.11.97",
     "aws-sdk": "^2.1467.0",

@@ -30,7 +30,6 @@ async function processJobsWithoutEmbeddings() {
     console.log(`Found ${res.rows.length} jobs without embeddings.`);
 
     for (const job of res.rows) {
-        console.log(`${job.description}`);
       try {
         if (!job.description) {
           console.warn(`Job with ID ${job.id} has no description. Skipping.`);
@@ -69,13 +68,9 @@ async function processJobsWithoutEmbeddings() {
 }
 
 // Schedule the job to run every hour
-cron.schedule('0 * * * *', () => {
+cron.schedule('* * * * *', () => {
   processJobsWithoutEmbeddings().catch((err) => {
     console.error('Scheduled job failed:', err);
   });
 });
-processJobsWithoutEmbeddings().catch((err) => {
-    console.error('Scheduled job failed:', err);
-  });
-
-console.log('Job vector processing scheduled. The task will run every hour.');
+console.log('Job vector processing scheduled. The task will run every minute.');

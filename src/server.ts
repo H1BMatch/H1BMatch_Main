@@ -1,27 +1,34 @@
 import dotenv from 'dotenv';
 dotenv.config();
-import express from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import {getCompanyData} from '../src/services/companyService';
 import jobRoutes from './routes/jobRoutes';
 import userRoutes from './routes/userRoutes';
+import { ClerkExpressWithAuth, LooseAuthProp, WithAuthProp } from '@clerk/clerk-sdk-node'
+import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
 
-// import { Job } from './models/job';
-// const { DynamoDBClient, PutItemCommand  } = require("@aws-sdk/client-dynamodb");
-// import { marshall } from '@aws-sdk/util-dynamodb';
+const app: Application = express()
 
-// const ddb = new DynamoDBClient({ region: 'us-east-2' });
-// console.log('AWS connection setup complete.');
+declare global {
+  namespace Express {
+    interface Request extends LooseAuthProp {}
+  }
+}
+const corsOptions = {
+  origin: 'http://localhost:5173', // Replace with your frontend's origin
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+};
 
 
-console.log("started");
 console.log('JWT_SECRET:', process.env.JWT_SECRET);
 
-
-const app = express();
+// const app = express();
+app.use(ClerkExpressWithAuth());
 app.set('json spaces', 2); 
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
@@ -29,6 +36,16 @@ app.listen(PORT, () => {
 app.use('/api/users', userRoutes);
 app.use('/api/auth', userRoutes);
 app.use('/api/jobs', jobRoutes);
+
+app.get('/api/user-profile', (req: WithAuthProp<Request>, res: Response) => {
+  const userId = req.auth?.userId ?? 'defaultUserId'; // Use userId from `req.auth`
+  if (userId) {
+    // Assuming you'll fetch and return user profile from the database here
+    res.json({ userId });
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+});
 
 // Error Handling Middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
