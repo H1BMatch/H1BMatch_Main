@@ -16,12 +16,9 @@ declare global {
   }
 }
 const corsOptions = {
-  origin: 'http://localhost:5173', // Replace with your frontend's origin
-  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  origin: 'http://localhost:5173/match', // Replace with your frontend's origin
+  credentials: true, 
 };
-
-
-console.log('JWT_SECRET:', process.env.JWT_SECRET);
 
 // const app = express();
 app.use(ClerkExpressWithAuth());
@@ -37,21 +34,15 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', userRoutes);
 app.use('/api/jobs', jobRoutes);
 
-app.get('/api/user-profile', (req: WithAuthProp<Request>, res: Response) => {
-  const userId = req.auth?.userId ?? 'defaultUserId'; // Use userId from `req.auth`
-  if (userId) {
-    // Assuming you'll fetch and return user profile from the database here
-    res.json({ userId });
-  } else {
-    res.status(401).json({ error: 'Unauthorized' });
-  }
-});
 
 // Error Handling Middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Unhandled Error:', err);
   res.status(500).json({ error: err.message });
 });
+
+
+
 
 app.get('/api/company', async (req, res) => {
   const companyName = req.query.company;

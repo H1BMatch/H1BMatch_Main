@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
-import { getUserProfile, createUserWithResume } from '../services/userService';
+import { getUserProfile, upsertUserWithResume } from '../services/userService';
 import { ClerkExpressRequireAuth, RequireAuthProp, StrictAuthProp } from '@clerk/clerk-sdk-node'
-import { updateUserResume } from '../services/userService';
+// import { updateUserResume } from '../services/userService';
 
 const userRoutes = express.Router();
 
@@ -14,16 +14,16 @@ userRoutes.use((req: Request, res: Response, next) => {
 });
 
 
-userRoutes.post('/update-resume', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+userRoutes.post('/add-resume', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
   const userId = req.auth?.userId;
-  const { newResume } = req.body;
+  const {resume} = req.body;
 
-  if (!userId || !newResume) {
+  if (!userId || !resume) {
     return res.status(400).json({ error: 'User ID and new resume are required.' });
   }
 
   try {
-    await updateUserResume(userId, newResume);
+    await upsertUserWithResume(userId, resume);
     res.status(200).json({ message: 'Resume updated successfully.' });
   } catch (error: any) {
     console.error('Error updating resume:', error);
@@ -32,7 +32,7 @@ userRoutes.post('/update-resume', ClerkExpressRequireAuth(), async (req: Request
 });
 
 // Get User Profile
-userRoutes.get('/profile', async (req: Request, res: Response) => {
+userRoutes.get('/profile',  ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
   try {
     const userId = req.auth?.userId;
     if (!userId) {
@@ -52,21 +52,21 @@ userRoutes.get('/profile', async (req: Request, res: Response) => {
 });
 
 // Create or Update User Profile
-userRoutes.post('/profile', async (req: Request, res: Response) => {
-  try {
-    const userId = req.auth?.userId;
-    const { resume_text } = req.body;
+// userRoutes.post('/profile', async (req: Request, res: Response) => {
+//   try {
+//     const userId = req.auth?.userId;
+//     const { resume_text } = req.body;
 
-    if (!userId) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+//     if (!userId) {
+//       return res.status(401).json({ message: 'Unauthorized' });
+//     }
 
-    const userProfile = await createUserWithResume(userId, resume_text);
-    res.status(201).json({ message: 'User profile created or updated', userProfile });
-  } catch (error: any) {
-    console.error('Error creating or updating user profile:', error);
-    res.status(500).json({ error: 'Failed to create or update user profile' });
-  }
-});
+//     const userProfile = await createUserWithResume(userId, resume_text);
+//     res.status(201).json({ message: 'User profile created or updated', userProfile });
+//   } catch (error: any) {
+//     console.error('Error creating or updating user profile:', error);
+//     res.status(500).json({ error: 'Failed to create or update user profile' });
+//   }
+// });
 
 export default userRoutes;

@@ -3,19 +3,18 @@ import dotenv from 'dotenv';
 dotenv.config();
 import pool from '../utils/RDSConnection';
 import { IUser } from '../models/User';
-import { IUserRegistration } from '../models/UserRegistration';
-import bcrypt from 'bcrypt';
 import { generateEmbedding } from './vectorService';
 import { QueryResult } from 'pg';
 import pgvector from 'pgvector';
-
 import { createClerkClient } from '@clerk/clerk-sdk-node'
+// incase user users email instead of clerk use the below imports 
+// import { IUserRegistration } from '../models/UserRegistration';
+// import bcrypt from 'bcrypt';
 
 const clerkAPIKey= process.env.CLERK_API_KEY
 const clerkClient = createClerkClient({ secretKey: clerkAPIKey })
 
-export async function createUserWithResume(userId: string, resume_text: string): Promise<IUser> {
-  
+export async function upsertUserWithResume(userId: string, resume_text: string): Promise<IUser> {
   // Generate resume vector
   let resume_vector: string | undefined;
   if (resume_text) {
@@ -31,6 +30,8 @@ export async function createUserWithResume(userId: string, resume_text: string):
   const query = `
     INSERT INTO users (clerk_user_id, resume_text, resume_vector)
     VALUES ($1, $2, $3)
+    ON CONFLICT (clerk_user_id)
+    DO UPDATE SET resume_text = EXCLUDED.resume_text, resume_vector = EXCLUDED.resume_vector
     RETURNING *;
   `;
   const values = [userId, resume_text, resume_vector];
@@ -38,9 +39,8 @@ export async function createUserWithResume(userId: string, resume_text: string):
   const result: QueryResult<IUser> = await pool.query(query, values);
   return result.rows[0];
 }
-
 export async function getUserProfile(userId: string): Promise<IUser | null> {
-  // Fetch user information by Clerk user ID from the database
+
   const query = 'SELECT * FROM users WHERE clerk_user_id = $1';
   const values = [userId];
 
@@ -58,35 +58,6 @@ export async function getClerkUser(clerkUserId: string) {
     throw new Error('Failed to fetch user from Clerk');
   }
 }
-
-export async function updateUserResume(userId: string, newResume: string): Promise<void> {
-  try {
-    // Generate the embedding for the new resume
-    const newEmbedding = await generateEmbedding(newResume);
-    const serializedEmbedding = pgvector.toSql(newEmbedding);
-
-    // Update the user's resume vector in the database
-    const query = `
-      UPDATE users
-      SET resume_vector = $1
-      WHERE clerk_user_id = $2;
-    `;
-    const values = [serializedEmbedding, userId];
-
-    const result = await pool.query(query, values);
-
-    if (result.rowCount === 0) {
-      throw new Error(`User with ID ${userId} not found.`);
-    }
-
-    console.log(`User ${userId}'s resume vector updated successfully.`);
-  } catch (error: any) {
-    console.error('Error updating user resume:', error);
-    throw error;
-  }
-}
-
-
 // export async function createUser(userData: IUser): Promise<IUser> {
 //   const { email, password_hash, name, resume_text, resume_vector } = userData;
 
@@ -154,3 +125,56 @@ export async function updateUserResume(userId: string, newResume: string): Promi
 
 
 
+
+
+// export async function createUserWithResume(userId: string, resume_text: string): Promise<IUser> {
+  
+//   // Generate resume vector
+//   let resume_vector: string | undefined;
+//   if (resume_text) {
+//     try {
+//       const embedding = await generateEmbedding(resume_text);
+//       resume_vector = pgvector.toSql(embedding);
+//     } catch (error) {
+//       console.error('Error generating resume embedding:', error);
+//       throw new Error('Failed to generate resume embedding.');
+//     }
+//   }
+
+//   const query = `
+//     INSERT INTO users (clerk_user_id, resume_text, resume_vector)
+//     VALUES ($1, $2, $3)
+//     RETURNING *;
+//   `;
+//   const values = [userId, resume_text, resume_vector];
+
+//   const result: QueryResult<IUser> = await pool.query(query, values);
+//   return result.rows[0];
+// }
+
+// export async function updateUserResume(userId: string, newResume: string): Promise<void> {
+//   try {
+//     // Generate the embedding for the new resume
+//     const newEmbedding = await generateEmbedding(newResume);
+//     const serializedEmbedding = pgvector.toSql(newEmbedding);
+
+//     // Update the user's resume vector in the database
+//     const query = `
+//       UPDATE users
+//       SET resume_vector = $1
+//       WHERE clerk_user_id = $2;
+//     `;
+//     const values = [serializedEmbedding, userId];
+
+//     const result = await pool.query(query, values);
+
+//     if (result.rowCount === 0) {
+//       throw new Error(`User with ID ${userId} not found.`);
+//     }
+
+//     console.log(`User ${userId}'s resume vector updated successfully.`);
+//   } catch (error: any) {
+//     console.error('Error updating user resume:', error);
+//     throw error;
+//   }
+// }

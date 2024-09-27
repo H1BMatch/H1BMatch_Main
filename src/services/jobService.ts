@@ -63,10 +63,10 @@ export async function getJobsBySimilarity(userId: string, filters: Filter[]): Pr
   return result.rows;
 }
 
-export async function getJobsByTitle(title: string): Promise<IJob[]> {
-  const query = 'SELECT * FROM jobs WHERE title ILIKE $1';
-  const values = [`%${title}%`];
+// export async function getJobsByTitle(title: string): Promise<IJob[]> {
+//   const query = 'SELECT * FROM jobs WHERE title ILIKE $1';
+//   const values = [`%${title}%`];
 
-  const result: QueryResult<IJob> = await pool.query(query, values);
-  return result.rows;
-}
+//   const result: QueryResult<IJob> = await pool.query(query, values);
+//   return result.rows;
+// }
