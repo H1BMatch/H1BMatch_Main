@@ -1,47 +1,21 @@
 // src/services/userService.ts
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
-import pool from '../utils/RDSConnection';
-import { IUser } from '../models/User';
-import { generateEmbedding } from './vectorService';
-import { QueryResult } from 'pg';
-import pgvector from 'pgvector';
-import { createClerkClient } from '@clerk/clerk-sdk-node'
-// incase user users email instead of clerk use the below imports 
+import pool from "../utils/RDSConnection";
+import { IUser } from "../models/User";
+import { generateEmbedding } from "./vectorService";
+import { QueryResult } from "pg";
+import pgvector from "pgvector";
+import { createClerkClient } from "@clerk/clerk-sdk-node";
+// incase user users email instead of clerk use the below imports
 // import { IUserRegistration } from '../models/UserRegistration';
 // import bcrypt from 'bcrypt';
 
-const clerkAPIKey= process.env.CLERK_API_KEY
-const clerkClient = createClerkClient({ secretKey: clerkAPIKey })
+const clerkAPIKey = process.env.CLERK_API_KEY;
+const clerkClient = createClerkClient({ secretKey: clerkAPIKey });
 
-export async function upsertUserWithResume(userId: string, resume_text: string): Promise<IUser> {
-  // Generate resume vector
-  let resume_vector: string | undefined;
-  if (resume_text) {
-    try {
-      const embedding = await generateEmbedding(resume_text);
-      resume_vector = pgvector.toSql(embedding);
-    } catch (error) {
-      console.error('Error generating resume embedding:', error);
-      throw new Error('Failed to generate resume embedding.');
-    }
-  }
-
-  const query = `
-    INSERT INTO users (clerk_user_id, resume_text, resume_vector)
-    VALUES ($1, $2, $3)
-    ON CONFLICT (clerk_user_id)
-    DO UPDATE SET resume_text = EXCLUDED.resume_text, resume_vector = EXCLUDED.resume_vector
-    RETURNING *;
-  `;
-  const values = [userId, resume_text, resume_vector];
-
-  const result: QueryResult<IUser> = await pool.query(query, values);
-  return result.rows[0];
-}
 export async function getUserProfile(userId: string): Promise<IUser | null> {
-
-  const query = 'SELECT * FROM users WHERE clerk_user_id = $1';
+  const query = "SELECT * FROM users WHERE clerk_user_id = $1";
   const values = [userId];
 
   const result: QueryResult<IUser> = await pool.query(query, values);
@@ -54,8 +28,8 @@ export async function getClerkUser(clerkUserId: string) {
     const user = await clerkClient.users.getUser(clerkUserId);
     return user;
   } catch (error) {
-    console.error('Error fetching Clerk user:', error);
-    throw new Error('Failed to fetch user from Clerk');
+    console.error("Error fetching Clerk user:", error);
+    throw new Error("Failed to fetch user from Clerk");
   }
 }
 // export async function createUser(userData: IUser): Promise<IUser> {
@@ -114,7 +88,6 @@ export async function getClerkUser(clerkUserId: string) {
 
 // // Additional methods can be added as needed
 
-
 // export async function getUserByEmail(email: string): Promise<IUser | null> {
 //   const query = 'SELECT * FROM users WHERE email = $1';
 //   const values = [email];
@@ -123,12 +96,8 @@ export async function getClerkUser(clerkUserId: string) {
 //   return result.rows[0] || null;
 // }
 
-
-
-
-
 // export async function createUserWithResume(userId: string, resume_text: string): Promise<IUser> {
-  
+
 //   // Generate resume vector
 //   let resume_vector: string | undefined;
 //   if (resume_text) {
