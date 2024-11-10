@@ -17,11 +17,11 @@ userRoutes.use((req: Request, res: Response, next) => {
 
 // User routes
 userRoutes.get(
-  "/user/:id",
+  "/user/",
   ClerkExpressRequireAuth(),
-  async (req: Request, res: Response) => {
+  async (req, res: Response) => {
     try {
-      const user = await userService.getClerkId(req.params.id);
+      const user = await userService.getClerkId(req.auth.userId ?? '');
       res.status(200).json(user);
     } catch (error) {
       res.status(500).json({ message: "Error fetching user", error });
@@ -34,7 +34,7 @@ userRoutes.post(
   ClerkExpressRequireAuth(),
   async (req: Request, res: Response) => {
     try {
-      const newUser = await userService.createUser(req.body);
+      const newUser = await userService.createUser(req.auth.userId ?? '');
       res.status(201).json(newUser);
     } catch (error) {
       res.status(500).json({ message: "Error creating user", error });

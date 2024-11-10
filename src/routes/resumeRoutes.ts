@@ -18,11 +18,11 @@ resumeRoutes.use((req: Request, res: Response, next) => {
 
 // Resume routes
 resumeRoutes.get(
-  "/resume/:id",
+  "/resume",
   ClerkExpressRequireAuth(),
   async (req: Request, res: Response) => {
     try {
-      const resume = await resumeService.getResumeByClerkId(req.params.id);
+      const resume = await resumeService.getResumeByClerkId(req.auth.userId ?? '');
       res.status(200).json(resume);
     } catch (error) {
       res.status(500).json({ message: "Error fetching resume", error });
@@ -31,13 +31,13 @@ resumeRoutes.get(
 );
 
 resumeRoutes.post(
-  "/resume/:id",
+  "/resume/",
   ClerkExpressRequireAuth(),
   async (req: Request, res: Response) => {
     try {
       const vectorizedText = await generateEmbedding(req.body.resume); // Vectorize text
 
-      const updatedResume = await resumeService.updateResume(req.params.id, {
+      const updatedResume = await resumeService.updateResume(req.auth.userId ?? '', {
         ...req.body,
         vectorizedText,
       });

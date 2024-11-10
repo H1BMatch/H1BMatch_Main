@@ -14,11 +14,11 @@ const clerkAPIKey = process.env.CLERK_API_KEY;
 const clerkClient = createClerkClient({ secretKey: clerkAPIKey });
 
 // Fetch user by ID from Clerk
-export const getClerkId = async (clerkUserId: string) => {
+export const getClerkId = async (id: string) => {
   try {
-    const clerkUser = await clerkClient.users.getUser(clerkUserId);
+    const clerkUser = await clerkClient.users.getUser(id);
     if (!clerkUser) {
-      throw new Error(`User with ID ${clerkUserId} not found in Clerk`);
+      throw new Error(`User with ID ${id} not found in Clerk`);
     }
 
     return {
@@ -28,21 +28,20 @@ export const getClerkId = async (clerkUserId: string) => {
       createdAt: clerkUser.createdAt,
     };
   } catch (error) {
-    throw new Error(`Error fetching user with ID ${clerkUserId}: ${error}`);
+    throw new Error(`Error fetching user with ID ${id}: ${error}`);
   }
 };
 
 // Create a new user in the database
-export const createUser = async (userData: any) => {
+export const createUser = async (id: string) => {
   try {
     const query = `INSERT INTO users (user_id, clerk_user_id, email, name, password_hash, created_at) 
                     VALUES ($1, $2, $3, $4, $5, NOW()) 
                     RETURNING *`;
-    const { clerk_user_id } = userData;
-    const clerkInfo = await getClerkId(clerk_user_id)
+    const clerkInfo = await getClerkId(id)
     const result: QueryResult<IUser> = await pool.query(query, [
       await newId(),
-      clerk_user_id,
+      id,
       clerkInfo.email,
       clerkInfo.name,
       generateHash(clerkInfo.name),
