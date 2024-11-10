@@ -17,7 +17,7 @@ userRoutes.use((req: Request, res: Response, next) => {
 
 // User routes
 userRoutes.get(
-  "/user/",
+  "/user",
   ClerkExpressRequireAuth(),
   async (req, res: Response) => {
     try {

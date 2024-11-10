@@ -31,7 +31,7 @@ resumeRoutes.get(
 );
 
 resumeRoutes.post(
-  "/resume/",
+  "/resume",
   ClerkExpressRequireAuth(),
   async (req: Request, res: Response) => {
     try {
