@@ -21,11 +21,20 @@ export const getClerkId = async (id: string) => {
       throw new Error(`User with ID ${id} not found in Clerk`);
     }
 
+    const name = clerkUser.firstName + " " + (clerkUser.lastName || "");
+    const email = clerkUser.emailAddresses[0]?.emailAddress || "";
+
+    const userExists  = await doesUserExist(id);
+    let user;
+    if (!userExists ) {
+      user = await createUser(id, name, email);
+    }
+    
     return {
-      id: clerkUser.id,
-      name: clerkUser.firstName + " " + (clerkUser.lastName || ""),
-      email: clerkUser.emailAddresses[0]?.emailAddress || "",
-      createdAt: clerkUser.createdAt,
+      name,
+      email,
+      resume_text: user?.resume_text || null,
+      resume_vector: user?.resume_vector || null
     };
   } catch (error) {
     throw new Error(`Error fetching user with ID ${id}: ${error}`);
@@ -33,18 +42,29 @@ export const getClerkId = async (id: string) => {
 };
 
 // Create a new user in the database
-export const createUser = async (id: string) => {
+async function doesUserExist (id: string) {
+  try {
+    const query = `SELECT EXISTS(SELECT 1 FROM users WHERE clerk_user_id = $1) AS user_exists`;
+    const result = await pool.query(query, [id]);
+    const user = result.rows[0];
+    return user.user_exists;
+  } catch (error) {
+    throw new Error(`Error check for user: ${error}`);
+  }
+};
+
+// Create a new user in the database
+async function createUser (id: string, name: string, email: string) {
   try {
     const query = `INSERT INTO users (user_id, clerk_user_id, email, name, password_hash, created_at) 
                     VALUES ($1, $2, $3, $4, $5, NOW()) 
                     RETURNING *`;
-    const clerkInfo = await getClerkId(id)
     const result: QueryResult<IUser> = await pool.query(query, [
       await newId(),
       id,
-      clerkInfo.email,
-      clerkInfo.name,
-      generateHash(clerkInfo.name),
+      email,
+      name,
+      generateHash(id),
     ]);
     const newUser = result.rows[0];
     return newUser;
