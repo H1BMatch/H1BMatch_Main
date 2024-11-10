@@ -29,17 +29,4 @@ userRoutes.get(
   }
 );
 
-// userRoutes.post(
-//   "/user",
-//   ClerkExpressRequireAuth(),
-//   async (req: Request, res: Response) => {
-//     try {
-//       const newUser = await userService.createUser(req.auth.userId ?? '');
-//       res.status(201).json(newUser);
-//     } catch (error) {
-//       res.status(500).json({ message: "Error creating user", error });
-//     }
-//   }
-// );
-
 export default userRoutes;
