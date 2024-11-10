@@ -24,11 +24,23 @@ declare global {
     interface Request extends LooseAuthProp {}
   }
 }
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+];
+
 const corsOptions = {
-  origin: "http://localhost:5173/match", // Replace with your frontend's origin
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
 
+app.use(cors(corsOptions));
 // const app = express();
 app.use(ClerkExpressWithAuth());
 app.set("json spaces", 2);
