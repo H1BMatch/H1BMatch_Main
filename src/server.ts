@@ -5,6 +5,7 @@ import cors from "cors";
 import { getCompanyData } from "../src/services/companyService";
 import jobRoutes from "./routes/jobRoutes";
 import userRoutes from "./routes/userRoutes";
+import resumeRoutes from "./routes/resumeRoutes";
 import {
   ClerkExpressWithAuth,
   LooseAuthProp,
@@ -39,7 +40,7 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 app.use("/api/", userRoutes);
-app.use("/api/auth", userRoutes);
+app.use("/api/", resumeRoutes);
 app.use("/api/jobs", jobRoutes);
 
 // Error Handling Middleware
