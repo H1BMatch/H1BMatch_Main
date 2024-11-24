@@ -1,14 +1,12 @@
 import express, { Request, Response } from "express";
 import * as resumeService from "../services/resumeService";
-import { generateEmbedding } from "../services/vectorService"; // Importing vectorization function
+import { generateEmbedding } from "../services/vectorService"; 
 import {
   ClerkExpressRequireAuth,
 } from "@clerk/clerk-sdk-node";
-// import { updateUserResume } from '../services/userService';
 
 const resumeRoutes = express.Router();
 
-// Middleware to protect routes (Clerk handles authentication)
 resumeRoutes.use((req: Request, res: Response, next) => {
   if (!req.auth?.userId) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -16,7 +14,6 @@ resumeRoutes.use((req: Request, res: Response, next) => {
   next();
 });
 
-// Resume routes
 resumeRoutes.get(
   "/resume",
   ClerkExpressRequireAuth(),
@@ -35,7 +32,7 @@ resumeRoutes.post(
   ClerkExpressRequireAuth(),
   async (req: Request, res: Response) => {
     try {
-      const vectorizedText = await generateEmbedding(req.body.resume); // Vectorize text
+      const vectorizedText = await generateEmbedding(req.body.resume); 
 
       const updatedResume = await resumeService.updateResume(req.auth.userId ?? '', {
         ...req.body,

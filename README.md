@@ -19,11 +19,11 @@ Navigate to the project directory:
  ```
 Install dependencies:
 ```sh
-yarn install
+npm install
 ```
 Start the application:
 ```sh
-yarn dev
+npm dev
 ```
 
 ## Built With

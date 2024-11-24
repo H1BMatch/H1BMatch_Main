@@ -1,4 +1,3 @@
-// src/models/Job.ts
 
 export interface IJob {
     id: string;

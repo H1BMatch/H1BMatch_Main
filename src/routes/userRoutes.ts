@@ -3,11 +3,9 @@ import * as userService from "../services/userService";
 import {
   ClerkExpressRequireAuth,
 } from "@clerk/clerk-sdk-node";
-// import { updateUserResume } from '../services/userService';
 
 const userRoutes = express.Router();
 
-// Middleware to protect routes (Clerk handles authentication)
 userRoutes.use((req: Request, res: Response, next) => {
   if (!req.auth?.userId) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -15,7 +13,6 @@ userRoutes.use((req: Request, res: Response, next) => {
   next();
 });
 
-// User routes
 userRoutes.get(
   "/user",
   ClerkExpressRequireAuth(),

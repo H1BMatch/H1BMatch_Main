@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import pool from "../utils/RDSConnection";
 
-// Fetch resume by ID
 export const getResumeByClerkId = async (id: string) => {
   try {
     const query = `SELECT resume_text, resume_vector 
@@ -16,7 +15,6 @@ export const getResumeByClerkId = async (id: string) => {
   }
 };
 
-// Update an existing resume in the database
 export const updateResume = async (id: string, resumeData: any) => {
   try {
     const { resume, vectorizedText } = resumeData;

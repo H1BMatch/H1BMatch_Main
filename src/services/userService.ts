@@ -1,4 +1,4 @@
-// src/services/userService.ts
+
 import dotenv from "dotenv";
 dotenv.config();
 import pool from "../utils/RDSConnection";
@@ -6,14 +6,12 @@ import { IUser } from "../models/User";
 import { QueryResult } from "pg";
 import { createClerkClient } from "@clerk/clerk-sdk-node";
 import { createHash } from 'crypto';
-// incase user users email instead of clerk use the below imports
-// import { IUserRegistration } from '../models/UserRegistration';
-// import bcrypt from 'bcrypt';
+
 
 const clerkAPIKey = process.env.CLERK_API_KEY;
 const clerkClient = createClerkClient({ secretKey: clerkAPIKey });
 
-// Fetch user by ID from Clerk
+
 export const getClerkId = async (id: string) => {
   try {
     const clerkUser = await clerkClient.users.getUser(id);
@@ -41,7 +39,7 @@ export const getClerkId = async (id: string) => {
   }
 };
 
-// Create a new user in the database
+
 async function doesUserExist (id: string) {
   try {
     const query = `SELECT EXISTS(SELECT 1 FROM users WHERE clerk_user_id = $1) AS user_exists`;
@@ -53,7 +51,6 @@ async function doesUserExist (id: string) {
   }
 };
 
-// Create a new user in the database
 async function createUser (id: string, name: string, email: string) {
   try {
     const query = `INSERT INTO users (user_id, clerk_user_id, email, name, password_hash, created_at) 

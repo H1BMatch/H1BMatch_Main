@@ -9,12 +9,6 @@ import resumeRoutes from "./routes/resumeRoutes";
 import {
   ClerkExpressWithAuth,
   LooseAuthProp,
-  WithAuthProp,
-} from "@clerk/clerk-sdk-node";
-import {
-  ClerkExpressRequireAuth,
-  RequireAuthProp,
-  StrictAuthProp,
 } from "@clerk/clerk-sdk-node";
 
 const app: Application = express();
@@ -83,26 +77,3 @@ app.get("/api/company", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
-// Routes
-// app.post('/jobs', async (req, res) => {
-//   const jobData: Job = req.body;
-//   const item = marshall(jobData);
-
-//   const params = {
-//     TableName: 'jobs',
-//     Item: item,
-//   };
-//   const command = new PutItemCommand(params );
-
-//   try {
-//     console.log('Attempting to store job data:', jobData);
-//     const response = await ddb.send(command);
-//     console.log(response);
-//     console.log('Job data stored successfully:', jobData);
-//     res.status(201).send('Job data stored successfully');
-//   } catch (error) {
-//     console.error('Error storing job data:', error);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// });

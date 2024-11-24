@@ -1,5 +1,4 @@
-// import pool from '../utils/RDSConnection';
-import pool from '../utils/localDBConnection';
+import pool from '../utils/RDSConnection';
 export async function getCompanyData(companyName: string) {
     const searchPattern = `%${companyName}%`;
     const result = await pool.query('SELECT SUM(1) FROM jobs WHERE employer_legal_business_name LIKE $1', [searchPattern]);
