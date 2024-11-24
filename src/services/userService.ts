@@ -74,6 +74,25 @@ function generateHash(data: string): string {
   return createHash('sha256').update(data).digest('hex');
 }
 
+
+// update the profile picture URL for a user in the database
+export async function updateUserProfilePictureUrl(userId: string, profilePictureUrl: string): Promise<void> {
+  // Update the user's profile picture URL in the database. This query 
+  // updates the profile_picture_url field for the user with the given Clerk user ID.
+  const query = `
+    UPDATE users
+    SET profile_picture_url = $1
+    WHERE clerk_user_id = $2;
+  `;
+  const values = [profilePictureUrl, userId];
+  const result = await pool.query(query, values);
+  if (result.rowCount === 0) {
+    throw new Error(`User with ID ${userId} not found.`);
+  }
+  console.log(`User ${userId}'s profile picture URL updated successfully.`);
+}
+
+
 async function newId() {
   try {
     const query = "SELECT COUNT(*) AS total_entries FROM users;";
