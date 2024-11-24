@@ -44,8 +44,7 @@ userRoutes.post(
   upload,
   async (req: Request, res: Response) => {
     try {
-      const userId: string = req.auth.userId!; // Guaranteed to exist due to ClerkExpressRequireAuth
-      console.log("inside the user profile picture upload");
+      const userId: string = req.auth.userId!;
       const documentFile = (req as MulterRequest).file;
 
       if (!documentFile) {
@@ -55,22 +54,26 @@ userRoutes.post(
       const imageBuffer = documentFile.buffer;
       const imageType = documentFile.mimetype;
 
-      // Validate MIME type (allow only images)
+      // Validate MIME type
       const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif"];
       if (!allowedMimeTypes.includes(imageType)) {
         return res.status(400).json({ message: "Invalid file type. Please upload an image." });
       }
 
-      // Generate secure, unique file name
-      const imageName = `${uuidv4()}-${Date.now()}`;
+      // Generate unique file name with extension
+      const fileExtension = imageType.split("/")[1];
+      const imageName = `${uuidv4()}-${Date.now()}.${fileExtension}`;
 
-      // Upload the image to Azure Blob Storage
-      await containerClient.uploadBlockBlob(imageName, imageBuffer, imageBuffer.length);
+      // Upload the image with MIME type
+      const blobClient = containerClient.getBlockBlobClient(imageName);
+      await blobClient.uploadData(imageBuffer, {
+        blobHTTPHeaders: { blobContentType: imageType },
+      });
 
       // Get the blob's public URL
-      const blobUrl: string = containerClient.getBlockBlobClient(imageName).url;
+      const blobUrl: string = blobClient.url;
 
-      // Update the user's profile picture URL in the database
+      // Update user's profile picture in the database
       await userService.updateUserProfilePictureUrl(userId, blobUrl);
 
       res.status(200).json({
