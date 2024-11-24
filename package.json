@@ -19,6 +19,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.421.0",
     "@aws-sdk/lib-dynamodb": "^3.421.0",
+    "@azure/storage-blob": "^12.26.0",
     "@clerk/clerk-sdk-node": "^5.0.44",
     "@types/express": "^4.17.18",
     "@types/mongoose": "^5.11.97",
@@ -30,10 +31,12 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.3",
+    "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
     "pg": "^8.11.3",
     "pgvector": "^0.2.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "uuid": "^11.0.3"
   },
   "scripts": {
     "watch": "tsc --watch",

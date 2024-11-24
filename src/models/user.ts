@@ -8,4 +8,7 @@ export interface IUser {
   resume_vector?: string; // Changed to string
   created_at?: Date;
   updated_at?: Date;
+  profile_picture_url?: string; 
+  user_bio?: string;
+  skills?: string[]; 
 }

@@ -1,9 +1,8 @@
 import express, { Request, Response } from "express";
 import * as userService from "../services/userService";
-import containerClient from "../utils/connectToAzureBlobStorage";
+import containerClient  from "../utils/connectToAzureBlobStorage";
 const multer = require("multer");
-const { v4: uuidv4 } = require('uuid');
-
+import { v4 as uuidv4 } from "uuid";
 
 import {
   ClerkExpressRequireAuth,
@@ -32,6 +31,7 @@ userRoutes.get(
 );
 
 // user routes to post the profile picture for the user
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage }).single("profilePicture");
 // file might not be recognized as a property of Request. So extend it to include the file as the multer request type.
@@ -45,13 +45,14 @@ userRoutes.post(
   async (req: Request, res: Response) => {
     try {
       const userId: string = req.auth.userId!; // Guaranteed to exist due to ClerkExpressRequireAuth
+      console.log("inside the user profile picture upload");
       const documentFile = (req as MulterRequest).file;
 
       if (!documentFile) {
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      const imageBuffer: Buffer = documentFile.buffer;
+      const imageBuffer = documentFile.buffer;
       const imageType = documentFile.mimetype;
 
       // Validate MIME type (allow only images)
@@ -61,7 +62,7 @@ userRoutes.post(
       }
 
       // Generate secure, unique file name
-      const imageName: string = `${uuidv4()}-${Date.now()}`;
+      const imageName = `${uuidv4()}-${Date.now()}`;
 
       // Upload the image to Azure Blob Storage
       await containerClient.uploadBlockBlob(imageName, imageBuffer, imageBuffer.length);
@@ -82,4 +83,21 @@ userRoutes.post(
     }
   }
 );
+
+
+
+//get the user profile information
+userRoutes.get('/profile',ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    const user: string = req.auth.userId ?? '';
+    const profileInfo  = await userService.getUserProfile(user); 
+    console.log(profileInfo);
+    res.status(200).json(profileInfo);
+  }
+  catch (error) {
+    res.status(500).json({ message: "Error fetching user", error });
+  }
+ });
+
 export default userRoutes;
+
