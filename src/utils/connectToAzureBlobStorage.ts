@@ -29,5 +29,5 @@ export function initializeContainerClient(): ContainerClient {
 }
 
 // Usage:
-// const containerClient = initializeContainerClient();
-export default initializeContainerClient;
+const containerClient = initializeContainerClient();
+export default containerClient;

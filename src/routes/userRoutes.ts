@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import * as userService from "../services/userService";
 import containerClient from "../utils/connectToAzureBlobStorage";
 const multer = require("multer");
+const { v4: uuidv4 } = require('uuid');
 
 
 import {
@@ -38,40 +39,47 @@ interface MulterRequest extends Request {
   file: any;
 }
 userRoutes.post(
-  "/upload-profile-picture", upload,
+  "/upload-profile-picture",
+  ClerkExpressRequireAuth(),
+  upload,
   async (req: Request, res: Response) => {
     try {
-      const userId = req.auth?.userId;
-      if (!userId) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const userId: string = req.auth.userId!; // Guaranteed to exist due to ClerkExpressRequireAuth
       const documentFile = (req as MulterRequest).file;
+
       if (!documentFile) {
         return res.status(400).json({ message: "No file uploaded" });
       }
-      const imageBuffer = documentFile.buffer;
+
+      const imageBuffer: Buffer = documentFile.buffer;
       const imageType = documentFile.mimetype;
-      // we might need to change how we name the image file. Can user ID but wont be a good idea security wise. The name for the image need to be unique.
-      const imageName = documentFile.originalname + Date.now();
 
-      //upload the imageBuffer to the azure blobStorage
-      await containerClient.uploadBlockBlob(imageName, imageBuffer, imageType);
+      // Validate MIME type (allow only images)
+      const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif"];
+      if (!allowedMimeTypes.includes(imageType)) {
+        return res.status(400).json({ message: "Invalid file type. Please upload an image." });
+      }
 
-      const blobUrl = containerClient.getBlockBlobClient(imageName).url;
-      // update the user profile picture URL in the database
-      await updateUserProfilePictureUrl(userId, blobUrl);
+      // Generate secure, unique file name
+      const imageName: string = `${uuidv4()}-${Date.now()}`;
 
-      res
-        .status(200)
-        .json({
-          message: "Profile picture uploaded successfully",
-          profileUrl: blobUrl,
-        });
+      // Upload the image to Azure Blob Storage
+      await containerClient.uploadBlockBlob(imageName, imageBuffer, imageBuffer.length);
+
+      // Get the blob's public URL
+      const blobUrl: string = containerClient.getBlockBlobClient(imageName).url;
+
+      // Update the user's profile picture URL in the database
+      await userService.updateUserProfilePictureUrl(userId, blobUrl);
+
+      res.status(200).json({
+        message: "Profile picture uploaded successfully",
+        profileUrl: blobUrl,
+      });
     } catch (error: any) {
       console.error("Error uploading profile picture:", error);
       res.status(500).json({ error: "Failed to upload profile picture" });
     }
   }
 );
-
 export default userRoutes;
