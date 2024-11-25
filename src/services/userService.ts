@@ -2,7 +2,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import pool from "../utils/RDSConnection";
-import { IUser } from "../models/User";
+import { IUser } from "../models/user";
 import { QueryResult } from "pg";
 import { createClerkClient } from "@clerk/clerk-sdk-node";
 import { createHash } from 'crypto';
@@ -70,9 +70,37 @@ async function createUser (id: string, name: string, email: string) {
   }
 };
 
+// This function fetches a user's profile from the database using their Clerk user ID
+export async function getUserProfile(userId: string): Promise<IUser | null> {
+  // Fetch user information by Clerk user ID from the database
+  const query = 'SELECT * FROM users WHERE clerk_user_id = $1';
+  const values = [userId];
+
+  const result: QueryResult<IUser> = await pool.query(query, values);
+  return result.rows[0] || null;
+}
+
 function generateHash(data: string): string {
   return createHash('sha256').update(data).digest('hex');
 }
+
+// update the profile picture URL for a user in the database
+export async function updateUserProfilePictureUrl(userId: string, profilePictureUrl: string): Promise<void> {
+  // Update the user's profile picture URL in the database. This query 
+  // updates the profile_picture_url field for the user with the given Clerk user ID.
+  const query = `
+    UPDATE users
+    SET profile_picture_link = $1
+    WHERE clerk_user_id = $2;
+  `;
+  const values = [profilePictureUrl, userId]; 
+  const result = await pool.query(query, values);
+  if (result.rowCount === 0) {
+    throw new Error(`User with ID ${userId} not found.`);
+  }
+  console.log(`User ${userId}'s profile picture URL updated successfully.`);
+}
+
 
 async function newId() {
   try {

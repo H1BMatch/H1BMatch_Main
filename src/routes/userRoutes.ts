@@ -1,5 +1,9 @@
 import express, { Request, Response } from "express";
 import * as userService from "../services/userService";
+import containerClient  from "../utils/connectToAzureBlobStorage";
+const multer = require("multer");
+import { v4 as uuidv4 } from "uuid";
+
 import {
   ClerkExpressRequireAuth,
 } from "@clerk/clerk-sdk-node";
@@ -26,4 +30,77 @@ userRoutes.get(
   }
 );
 
+// user routes to post the profile picture for the user
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage }).single("profilePicture");
+// file might not be recognized as a property of Request. So extend it to include the file as the multer request type.
+interface MulterRequest extends Request {
+  file: any;
+}
+userRoutes.post(
+  "/upload-profile-picture",
+  ClerkExpressRequireAuth(),
+  upload,
+  async (req: Request, res: Response) => {
+    try {
+      const userId: string = req.auth.userId!;
+      const documentFile = (req as MulterRequest).file;
+
+      if (!documentFile) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const imageBuffer = documentFile.buffer;
+      const imageType = documentFile.mimetype;
+
+      // Validate MIME type
+      const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif"];
+      if (!allowedMimeTypes.includes(imageType)) {
+        return res.status(400).json({ message: "Invalid file type. Please upload an image." });
+      }
+
+      // Generate unique file name with extension
+      const fileExtension = imageType.split("/")[1];
+      const imageName = `${uuidv4()}-${Date.now()}.${fileExtension}`;
+
+      // Upload the image with MIME type
+      const blobClient = containerClient.getBlockBlobClient(imageName);
+      await blobClient.uploadData(imageBuffer, {
+        blobHTTPHeaders: { blobContentType: imageType },
+      });
+
+      // Get the blob's public URL
+      const blobUrl: string = blobClient.url;
+
+      // Update user's profile picture in the database
+      await userService.updateUserProfilePictureUrl(userId, blobUrl);
+
+      res.status(200).json({
+        message: "Profile picture uploaded successfully",
+        profileUrl: blobUrl,
+      });
+    } catch (error: any) {
+      console.error("Error uploading profile picture:", error);
+      res.status(500).json({ error: "Failed to upload profile picture" });
+    }
+  }
+);
+
+
+
+//get the user profile information
+userRoutes.get('/profile',ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    const user: string = req.auth.userId ?? '';
+    const profileInfo  = await userService.getUserProfile(user); 
+    console.log(profileInfo);
+    res.status(200).json(profileInfo);
+  }
+  catch (error) {
+    res.status(500).json({ message: "Error fetching user", error });
+  }
+ });
+
 export default userRoutes;
+
