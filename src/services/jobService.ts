@@ -125,7 +125,6 @@ export async function getJobsBySimilarity(
   return result.rows;
 }
 
-
 export async function getAppliedJobs(userIds: string): Promise<IJob[]> {
   const userId: string = userIds;
   console.log("Indsie get applied jobs", userId);
@@ -164,9 +163,11 @@ export async function getAppliedJobs(userIds: string): Promise<IJob[]> {
   `;
 
   const result = await pool.query(query, [userId]);
-  // if (result.rowCount === 0) {
-  //   return [];
-  // }
+  if (result.rowCount === 0) {
+    console.log("No applied jobs found for user with ID", userId);
+    throw new Error(`No applied jobs found for user with ID ${userId}`);
+  }
+  console.log("Applied date is " +result.rows[0].applieddate);
   return result.rows.map(row => ({
     id: row.id,
     job_id: row.id,
