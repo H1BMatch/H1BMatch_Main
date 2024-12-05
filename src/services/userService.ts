@@ -101,6 +101,76 @@ export async function updateUserProfilePictureUrl(userId: string, profilePicture
   console.log(`User ${userId}'s profile picture URL updated successfully.`);
 }
 
+export async function updateUserBio(userId: string, bio: string): Promise<boolean> { 
+  try {
+    const query = `UPDATE users SET bio = $1 WHERE clerk_user_id = $2 RETURNING *`;
+    const result = await pool.query(query, [bio, userId]);
+    if (result.rowCount === 0) {
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+    console.log(`User ${userId}'s bio updated successfully.`);
+    return true;
+  }
+  catch (error) {
+    throw new Error(`Error updating bio: ${error}`);
+  }
+}
+export async function updateUserAbout(userId: string, about: string): Promise<boolean> { 
+  try {
+    const query = `UPDATE users SET about = $1 WHERE clerk_user_id = $2 RETURNING *`;
+    const result = await pool.query(query, [about, userId]);
+    if (result.rowCount === 0) {
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+    console.log(`User ${userId}'s about section updated successfully.`);
+    return true;
+  }
+  catch (error) {
+    throw new Error(`Error updating bio: ${error}`);
+  }
+}
+export async function updateUserTitle(userId: string, title: string): Promise<boolean> { 
+  try {
+    const query = `UPDATE users SET title = $1 WHERE clerk_user_id = $2 RETURNING *`;
+    const result = await pool.query(query, [title, userId]);
+    if (result.rowCount === 0) {
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+    console.log(`User ${userId}'s title section updated successfully.`);
+    return true;
+  }
+  catch (error) {
+    throw new Error(`Error updating bio: ${error}`);
+  }
+}
+export async function updateUserLocation(userId: string, location: string): Promise<boolean> { 
+  try {
+    const query = `UPDATE users SET location = $1 WHERE clerk_user_id = $2 RETURNING *`;
+    const result = await pool.query(query, [location, userId]);
+    if (result.rowCount === 0) {
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+    console.log(`User ${userId}'s location section updated successfully.`);
+    return true;
+  }
+  catch (error) {
+    throw new Error(`Error updating bio: ${error}`);
+  }
+}
+
+export async function updateUserSkills(userId: string, skills: string[]): Promise<boolean> {
+  try {
+    const query = `UPDATE users SET skills = $1 WHERE clerk_user_id = $2 RETURNING *`;
+    const result = await pool.query(query, [skills, userId]);
+    if (result.rowCount === 0) {
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+    console.log(`User ${userId}'s skills updated successfully.`);
+    return true;
+  } catch (error) {
+    throw new Error(`Error updating skills: ${error}`);
+  }
+}
 
 async function newId() {
   try {
@@ -111,3 +181,4 @@ async function newId() {
     throw new Error(`Error getting next id from database: ${error}`);
   }
 }
+

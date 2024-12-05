@@ -102,5 +102,85 @@ userRoutes.get('/profile',ClerkExpressRequireAuth(), async (req: Request, res: R
   }
  });
 
+
+// update the user Bio
+
+userRoutes.post('/update-bio', ClerkExpressRequireAuth(), async (req: Request, res: Response) => { 
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const bio: string = req.body.bio;
+    const updatedBio = await userService.updateUserBio(user, bio);
+    if (!updatedBio) {
+      return res.status(500).json({ message: "Error updating bio" });
+    }
+    res.status(200).json(updatedBio);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating bio", error });
+  }  
+});
+// routes to update the about section
+
+userRoutes.post('/update-about', ClerkExpressRequireAuth(), async (req: Request, res: Response) => { 
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const about: string = req.body.about;
+    const updatedAbout = await userService.updateUserAbout(user, about);
+    if (!updatedAbout) {
+      return res.status(500).json({ message: "Error updating about section" });
+    }
+    res.status(200).json(updatedAbout);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating bio", error });
+  }  
+});
+
+userRoutes.post('/update-title', ClerkExpressRequireAuth(), async (req: Request, res: Response) => { 
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const title: string = req.body.jobTitle;
+    const updatedTitle = await userService.updateUserTitle(user, title);
+    if (!updatedTitle) {
+      return res.status(500).json({ message: "Error updating title" });
+    }
+    res.status(200).json(updatedTitle);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating title", error });
+  }  
+});
+
+userRoutes.post('/update-location', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const location: string = req.body.location;
+    const updatedLocation = await userService.updateUserLocation(user, location);
+    if (!updatedLocation) {
+      return res.status(500).json({ message: "Error updating location" });
+    }
+    res.status(200).json(updatedLocation);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating location", error });
+  }  
+});  
+
+userRoutes.post('/update-skills', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const skills: string[] = req.body.skills;
+    const updatedSkills = await userService.updateUserSkills(user, skills);
+    if (!updatedSkills) {
+      return res.status(500).json({ message: "Error updating skills" });
+    }
+    res.status(200).json(updatedSkills);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating skills", error });
+  }  
+});
+
+
 export default userRoutes;
 
