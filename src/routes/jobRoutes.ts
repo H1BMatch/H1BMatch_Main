@@ -1,6 +1,6 @@
 
 import express, { Request, Response } from 'express';
-import { getJobsBySimilarity } from '../services/jobService';
+import { getJobsBySimilarity,getAppliedJobs } from '../services/jobService';
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 
 const jobRoutes = express.Router();
@@ -41,6 +41,20 @@ jobRoutes.get(
     }
   }
 );
+jobRoutes.get('/applied-jobs', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const appliedDate: string = req.body.appliedDate;
+    const getAppliedJobsForTheUser = await getAppliedJobs(user);
+    if (!getAppliedJobsForTheUser) {
+      return res.status(500).json({ message: "Error updating applied jobs" });
+    }
+    res.status(200).json(getAppliedJobsForTheUser);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating applied jobs", error });
+  }  
+});
 
 export default jobRoutes;
 

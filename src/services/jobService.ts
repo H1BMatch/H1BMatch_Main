@@ -1,7 +1,7 @@
 // src/services/jobService.ts
 
 import pool from '../utils/RDSConnection';
-import { IJob } from '../models/Job';
+import { IJob } from '../models/job';
 import { QueryResult } from 'pg';
 
 interface Filters {
@@ -114,3 +114,70 @@ export async function getJobsBySimilarity(
   return result.rows;
 }
 
+export async function getAppliedJobs(userIds: string): Promise<IJob[]> {
+  const userId: string = userIds;
+  console.log("Indsie get applied jobs", userId);
+  const query = `
+    SELECT
+      j.id,
+      j.title,
+      j.company,
+      j.job_url,
+      j.state,
+      j.description,
+      j.job_type,
+      j.salary_interval,
+      j.min_amount,
+      j.max_amount,
+      j.currency,
+      j.salary_source,
+      j.is_sponsor,
+      j.date_posted,
+      j.emails,
+      j.is_remote,
+      j.job_level,
+      j.company_description,
+      j.state,
+      j.logo_photo_url,
+      ja.applieddate as applieddate
+    FROM users u
+    JOIN LATERAL (
+      SELECT
+        job_application->>'jobId' AS jobId,
+        job_application->>'appliedDate' AS appliedDate
+      FROM jsonb_array_elements(u.jobs_applied) AS job_application
+    ) ja ON true
+    JOIN jobs j ON j.id = ja.jobId
+    WHERE u.clerk_user_id = $1;  -- Filter by the userId
+  `;
+
+  const result = await pool.query(query, [userId]);
+  if (result.rowCount === 0) {
+    console.log("No applied jobs found for user with ID", userId);
+    throw new Error(`No applied jobs found for user with ID ${userId}`);
+  }
+  console.log("Applied date is " +result.rows[0].applieddate);
+  return result.rows.map(row => ({
+    id: row.id,
+    job_id: row.id,
+    title: row.title,
+    company: row.company,
+    job_url: row.job_url,
+    state: row.state,
+    description: row.description,
+    job_type: row.job_type,
+    salary_interval: row.salary_interval,
+    min_amount: row.min_amount,
+    max_amount: row.max_amount,
+    currency: row.currency,
+    salary_source: row.salary_source,
+    is_sponsor: row.is_sponsor,
+    date_posted: row.date_posted,
+    emails: row.emails,
+    is_remote: row.is_remote,
+    job_level: row.job_level,
+    company_description: row.company_description,
+    logo_photo_url: row.logo_photo_url,
+    applieddate: row.applieddate,
+  }));
+}

@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   ClerkExpressRequireAuth,
 } from "@clerk/clerk-sdk-node";
+import { ok } from "assert";
 
 const userRoutes = express.Router();
 
@@ -86,8 +87,6 @@ userRoutes.post(
     }
   }
 );
-
-
 
 //get the user profile information
 userRoutes.get('/profile',ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
@@ -178,6 +177,24 @@ userRoutes.post('/update-skills', ClerkExpressRequireAuth(), async (req: Request
     res.status(200).json(updatedSkills);
   } catch (error) {
     res.status(500).json({ message: "Error updating skills", error });
+  }  
+});
+userRoutes.post('/applied-jobs', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  console.log("Inside applied jobs");
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const jobId: string = req.body.jobId;
+    const appliedDate: string = req.body.appliedDate;
+    console.log("Applied date and user id and job id is ", appliedDate, user, jobId);
+    const appliedJobs = await userService.updateAppliedJobs(user, jobId, appliedDate);
+    console.log("Applied jobs is ");
+    if (!appliedJobs) {
+      return res.status(500).json({ message: "Error updating applied jobs" });
+    }
+    res.status(200).json({ok: "ok"});
+  } catch (error) {
+    res.status(500).json({ message: "Error updating applied jobs", error });
   }  
 });
 
