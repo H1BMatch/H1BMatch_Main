@@ -33,5 +33,7 @@ export interface IJob {
     job_vector?: number[]; // Array of numbers for the vector
     created_at?: Date;
     updated_at?: Date;
+    is_sponsor?: boolean;
+    
   }
   

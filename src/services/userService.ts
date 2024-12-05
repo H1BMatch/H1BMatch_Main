@@ -126,7 +126,7 @@ export async function updateUserAbout(userId: string, about: string): Promise<bo
     return true;
   }
   catch (error) {
-    throw new Error(`Error updating bio: ${error}`);
+    throw new Error(`Error updating about section: ${error}`);
   }
 }
 export async function updateUserTitle(userId: string, title: string): Promise<boolean> { 
@@ -140,7 +140,7 @@ export async function updateUserTitle(userId: string, title: string): Promise<bo
     return true;
   }
   catch (error) {
-    throw new Error(`Error updating bio: ${error}`);
+    throw new Error(`Error updating title: ${error}`);
   }
 }
 export async function updateUserLocation(userId: string, location: string): Promise<boolean> { 
@@ -154,7 +154,7 @@ export async function updateUserLocation(userId: string, location: string): Prom
     return true;
   }
   catch (error) {
-    throw new Error(`Error updating bio: ${error}`);
+    throw new Error(`Error updating location: ${error}`);
   }
 }
 
@@ -169,6 +169,29 @@ export async function updateUserSkills(userId: string, skills: string[]): Promis
     return true;
   } catch (error) {
     throw new Error(`Error updating skills: ${error}`);
+  }
+}
+export async function updateAppliedJobs(userId: string, jobId: string, appliedDates:string) { 
+  console.log("Inside update applied jobs");
+  try {
+    const query = `
+      UPDATE users
+      SET jobs_applied = COALESCE(jobs_applied, '[]'::jsonb) || $1::jsonb
+      WHERE clerk_user_id = $2
+      RETURNING *;
+    `;
+    const appliedDate = new Date(appliedDates).toISOString().split('T')[0];
+    const jobApplication = { jobId, appliedDate };
+    const result = await pool.query(query, [JSON.stringify(jobApplication), userId]);
+    if (result.rowCount === 0) {
+      throw new Error(`User with ID ${userId} not found.`);
+    }
+
+    console.log(`User ${userId} applied for job ${jobId} successfully.`);
+    return true;
+  } catch (error) {
+    console.error(`Failed to update applied jobs for user ${userId}:`, error);
+    throw new Error(`Error updating applied jobs: ${error}`);
   }
 }
 
