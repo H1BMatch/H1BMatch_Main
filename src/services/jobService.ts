@@ -24,13 +24,23 @@ export async function getJobsBySimilarity(
   userId: string,
   filters: Filters
 ): Promise<IJob[]> {
+  const appliedJobs = await getAppliedJobs(userId); // Get applied jobs
+  const appliedJobIds = appliedJobs.map((job) => job.id); // Extract job IDs
   const values: any[] = [userId];
   let filterIndex = 2; // $1 is userId
+
   let query = `
     SELECT *, job_vector <-> (SELECT resume_vector FROM users WHERE clerk_user_id = $1) AS distance
     FROM jobs
     WHERE job_vector IS NOT NULL
   `;
+
+  // Exclude applied jobs
+  if (appliedJobIds.length > 0) {
+    query += ` AND id NOT IN (${appliedJobIds.map((_, index) => `$${filterIndex + index}`).join(", ")})`;
+    values.push(...appliedJobIds);
+    filterIndex += appliedJobIds.length;
+  }
 
   // Build query based on filters
   if (filters.title) {
@@ -113,6 +123,7 @@ export async function getJobsBySimilarity(
   );
   return result.rows;
 }
+
 
 export async function getAppliedJobs(userIds: string): Promise<IJob[]> {
   const userId: string = userIds;
