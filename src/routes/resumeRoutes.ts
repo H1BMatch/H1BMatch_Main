@@ -40,6 +40,8 @@ resumeRoutes.post(
       });
       
 
+      
+
       res.status(200).json(updatedResume);
     } catch (error) {
       res.status(500).json({ message: "Error updating resume", error });
