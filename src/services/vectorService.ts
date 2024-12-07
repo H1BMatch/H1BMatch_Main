@@ -6,17 +6,18 @@ const LLAMA3_API_URL =
   process.env.LLAMA3_API_URL || "http://localhost:11434/api/embed";
 
 export async function generateEmbedding(text: string): Promise<number[]> {
+  console.log("Generating embedding for text:", text);
   try {
     const response = await axios.post(LLAMA3_API_URL, {
       model: "llama3.1",
       input: text,
     });
 
-    console.log("Response:", response.data);
-
+    console.log("Response:", response);
     if (response.status !== 200) {
       throw new Error(`API returned status code ${response.status}`);
     }
+    
 
     const embeddings = response.data.embeddings;
     console.log("Embeddings:", embeddings);
@@ -24,7 +25,6 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     if (!Array.isArray(embeddings) || !Array.isArray(embeddings[0])) {
       throw new Error("Invalid embedding format received from LLaMA3 API.");
     }
-
     // Flatten the embeddings array
     const embedding = embeddings.flat();
     console.log("Flattened Embedding:", embedding);

@@ -33,7 +33,7 @@ resumeRoutes.post(
   async (req: Request, res: Response) => {
     try {
       const vectorizedText = await generateEmbedding(req.body.resume); 
-
+      console.log("Vectorized text: ", vectorizedText);
       const updatedResume = await resumeService.updateResume(req.auth.userId ?? '', {
         ...req.body,
         vectorizedText,

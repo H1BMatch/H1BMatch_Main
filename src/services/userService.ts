@@ -16,9 +16,8 @@ export const getClerkId = async (id: string) => {
   try {
     const clerkUser = await clerkClient.users.getUser(id);
     if (!clerkUser) {
-      throw new Error(`User with ID ${id} not found in Clerk`);
+     throw new Error (`User with ID ${id} not found in Clerk`);
     }
-
     const name = clerkUser.firstName + " " + (clerkUser.lastName || "");
     const email = clerkUser.emailAddresses[0]?.emailAddress || "";
 
@@ -52,6 +51,7 @@ async function doesUserExist (id: string) {
 };
 
 async function createUser (id: string, name: string, email: string) {
+  console.log("Inside create user function");
   try {
     const query = `INSERT INTO users (user_id, clerk_user_id, email, name, password_hash, created_at) 
                     VALUES ($1, $2, $3, $4, $5, NOW()) 
