@@ -15,7 +15,7 @@ jobRoutes.get(
     }
     try {
       const filters ={}
-      // Extract filters from query parameters
+      // // Extract filters from query parameters
       // const filters = {
       //   title: req.query.title as string,
       //   company: req.query.company as string,
@@ -29,11 +29,11 @@ jobRoutes.get(
       //   max_salary: req.query.max_salary as string,
       //   job_level: req.query.job_level as string,
       //   company_industry: req.query.company_industry as string,
-      //   is_sponsor: req.query.is_sponsor === 'true',
+      //   is_sponsor: req.query.is_sponsor === 'true' || false,
       // };
+      console.log('filters:', req.query);
 
       const jobs = await getJobsBySimilarity(userId, filters);
-      console.log('jobs:', jobs);
       res.status(200).json(jobs);
     } catch (error: any) {
       console.error('Error fetching matched jobs:', error);
@@ -50,6 +50,7 @@ jobRoutes.get('/applied-jobs', ClerkExpressRequireAuth(), async (req: Request, r
     if (!getAppliedJobsForTheUser) {
       return res.status(500).json({ message: "Error updating applied jobs" });
     }
+    console.log("Applied jobs is ", getAppliedJobsForTheUser);
     res.status(200).json(getAppliedJobsForTheUser);
   } catch (error) {
     res.status(500).json({ message: "Error updating applied jobs", error });
