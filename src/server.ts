@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
-import { getCompanyData } from "../src/services/companyService";
+import { getCompanyData } from "./services/companyService";
 import jobRoutes from "./routes/jobRoutes";
 import userRoutes from "./routes/userRoutes";
 import resumeRoutes from "./routes/resumeRoutes";
