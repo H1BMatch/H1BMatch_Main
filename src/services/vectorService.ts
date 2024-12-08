@@ -6,7 +6,6 @@ const LLAMA3_API_URL =
   process.env.LLAMA3_API_URL || "http://localhost:11434/api/embed";
 
 export async function generateEmbedding(text: string): Promise<number[]> {
-  console.log("Generating embedding for text:", text);
   try {
     const response = await axios.post(LLAMA3_API_URL, {
       model: "llama3.1",
