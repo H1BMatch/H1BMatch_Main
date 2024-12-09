@@ -19,9 +19,9 @@ declare global {
   }
 }
 const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "https://h1bmatch.azurewebsites.net/",//production front end url
+  //"http://localhost:3000",
+  //"http://localhost:5173",
+  "https://h1bmatch.azurewebsites.net"//production front end url
 ];
 
 const corsOptions = {
@@ -29,7 +29,7 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("Not allowed by CORS. Please check the origin."));
     }
   },
   credentials: true,
