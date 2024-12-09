@@ -8,12 +8,13 @@ const jobRoutes = express.Router();
 jobRoutes.get(
   '/match',
   ClerkExpressRequireAuth(),
-  async (req: Request, res: Response) => {'
+  async (req: Request, res: Response) => {
     const userId = req.auth?.userId;
     console.log("User Id is " +  userId);
     console.log("Req auth is " +  req.auth);
                                           
     if (!userId) {
+      console.log("inside the not userId");
       return res.status(403).json({ error: 'Unauthorized' });
     }
     try {
