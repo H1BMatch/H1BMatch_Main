@@ -21,6 +21,7 @@ declare global {
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
+  "https://h1bmatch.azurewebsites.net/",//production front end url
 ];
 
 const corsOptions = {
@@ -39,7 +40,6 @@ app.use(cors(corsOptions));
 app.use(ClerkExpressWithAuth());
 app.set("json spaces", 2);
 app.use(express.json());
-app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
