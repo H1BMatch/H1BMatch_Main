@@ -19,14 +19,20 @@ declare global {
   }
 }
 const allowedOrigins = [
+<<<<<<< HEAD
   //"http://localhost:8080",
   //"http://localhost:5173",
   "https://h1bbackend.azurewebsites.net",//production backend url
+=======
+  //"http://localhost:3000",
+  "https://h1bbackend.azurewebsites.net", //production backend url
+>>>>>>> 7340bc3497bef25b3a3f29eb6f26b70692836cd5
   "https://h1bmatch.azurewebsites.net"//production front end url
 ];
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    console.log("The origin is" + origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
