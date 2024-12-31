@@ -1,4 +1,3 @@
-
 export interface IJob {
     id: string;
     title: string;
@@ -34,6 +33,5 @@ export interface IJob {
     created_at?: Date;
     updated_at?: Date;
     is_sponsor?: boolean;
-    
   }
   

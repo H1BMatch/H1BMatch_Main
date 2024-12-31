@@ -19,10 +19,11 @@ declare global {
   }
 }
 const allowedOrigins = [
-  //"http://localhost:8080",
+  "http://localhost:8080",
   //"http://localhost:5173",
   "https://h1bbackend.azurewebsites.net",//production backend url
-  "https://h1bmatch.azurewebsites.net"//production front end url
+  "https://h1bmatch.azurewebsites.net",//production front end url
+  "https://appjob.net/"
 ];
 
 const corsOptions = {
