@@ -48,32 +48,32 @@ export async function getJobsBySimilarity(
     values.push(`%${filters.title}%`);
     filterIndex++;
   }
-  if (filters.company) {
-    query += ` AND company ILIKE $${filterIndex}`;
-    values.push(`%${filters.company}%`);
-    filterIndex++;
-  }
-  if (filters.city) {
-    query += ` AND city = $${filterIndex}`;
-    values.push(filters.city);
-    filterIndex++;
-  }
-  if (filters.state) {
-    query += ` AND state = $${filterIndex}`;
-    values.push(filters.state);
-    filterIndex++;
-  }
-  if (filters.country) {
-    query += ` AND country = $${filterIndex}`;
-    values.push(filters.country);
-    filterIndex++;
-  }
+  // if (filters.company) {
+  //   query += ` AND company ILIKE $${filterIndex}`;
+  //   values.push(`%${filters.company}%`);
+  //   filterIndex++;
+  // }
+  // if (filters.city) {
+  //   query += ` AND city = $${filterIndex}`;
+  //   values.push(filters.city);
+  //   filterIndex++;
+  // }
+  // if (filters.state) {
+  //   query += ` AND state = $${filterIndex}`;
+  //   values.push(filters.state);
+  //   filterIndex++;
+  // }
+  // if (filters.country) {
+  //   query += ` AND country = $${filterIndex}`;
+  //   values.push(filters.country);
+  //   filterIndex++;
+  // }
   if (filters.job_type) {
     query += ` AND job_type = $${filterIndex}`;
     values.push(filters.job_type);
     filterIndex++;
   }
-  if (filters.is_remote !== undefined) {
+  if (filters.is_remote !== undefined && filters.is_remote !== false) {
     query += ` AND is_remote = $${filterIndex}`;
     values.push(filters.is_remote);
     filterIndex++;
@@ -106,17 +106,18 @@ export async function getJobsBySimilarity(
     values.push(filters.company_industry);
     filterIndex++;
   }
-  if (filters.is_sponsor !== undefined) {
-    query += ` AND is_sponsor = $${filterIndex}`;
-    values.push(filters.is_sponsor);
-    filterIndex++;
-  }
+  // if (filters.is_sponsor !== undefined) {
+  //   query += ` AND is_sponsor = $${filterIndex}`;
+  //   values.push(filters.is_sponsor);
+  //   filterIndex++;
+  // }
 
   query += `
     ORDER BY distance
     LIMIT 50
   `;
 
+  console.log("Query is ", query);
   const result: QueryResult<IJob & { distance: number }> = await pool.query(
     query,
     values
@@ -163,10 +164,9 @@ export async function getAppliedJobs(userIds: string): Promise<IJob[]> {
   `;
 
   const result = await pool.query(query, [userId]);
-  if (result.rowCount === 0) {
-    return [];
-  }
-  console.log("Applied date is " +result.rows[0].applieddate);
+  // if (result.rowCount === 0) {
+  //   return [];
+  // }
   return result.rows.map(row => ({
     id: row.id,
     job_id: row.id,
