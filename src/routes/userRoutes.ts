@@ -23,6 +23,7 @@ userRoutes.get(
   ClerkExpressRequireAuth(),
   async (req, res: Response) => {
     try {
+      console.log("Inside user routes");
       const user = await userService.getClerkId(req.auth.userId ?? '');
       res.status(200).json(user);
     } catch (error) {
