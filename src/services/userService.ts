@@ -22,6 +22,7 @@ export const getClerkId = async (id: string) => {
     const email = clerkUser.emailAddresses[0]?.emailAddress || "";
 
     const userExists  = await doesUserExist(id);
+    console.log("The user exists is ", userExists);
     let user;
     if (!userExists ) {
       user = await createUser(id, name, email);
@@ -40,10 +41,12 @@ export const getClerkId = async (id: string) => {
 
 
 async function doesUserExist (id: string) {
+  console.log("Inside does user exist function");
   try {
     const query = `SELECT EXISTS(SELECT 1 FROM users WHERE clerk_user_id = $1) AS user_exists`;
     const result = await pool.query(query, [id]);
     const user = result.rows[0];
+    console.log("The user exists is in the database ", user.user_exists);
     return user.user_exists;
   } catch (error) {
     throw new Error(`Error check for user: ${error}`);
