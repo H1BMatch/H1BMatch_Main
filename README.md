@@ -1,5 +1,7 @@
 # H1BMatch_Main
 This repository contains the main expressJS application for H1BMatch. The service handles API requests from the front-end and includes schedlued jobs that vectorize job detials and filter jobs from sponsoring companies. 
+## Note
+For full functionality, you will need connection credentials for our AWS and Azure databases, and a lamma3.1 running locally or deployed.
 
 ## Getting Started
 
