@@ -1,13 +1,11 @@
 # H1BMatch_Main
-This repository contains the main expressJS application.
+This repository contains the main expressJS application for H1BMatch. The service handles API requests from the front-end and includes schedlued jobs that vectorize job detials and filter jobs from sponsoring companies. 
 
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Installing
-
-A step by step series of examples that tell you how to get a development environment running
 
 Clone the repository:
 
@@ -23,14 +21,13 @@ npm install
 ```
 Start the application:
 ```sh
-npm dev
+npm run dev
 ```
 
 ## Built With
 
 * [Node.js](https://nodejs.org/) - The web framework used
 * [Express](https://expressjs.com/) - Dependency Management
-* [Mocha](https://mochajs.org/) - Used to generate RSS Feeds
 
 ## Contributing
 
@@ -40,11 +37,8 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 * **Yoseph Shibiru** - *Initial work* - [Yoseph](https://github.com/redsprites)
 
-See also the list of [contributors](https://github.com/yourname/project/contributors) who participated in this project.
+See also the list of [contributors]([https://github.com/yourname/project/contributors](https://github.com/H1BMatch/H1BMatch_Main/graphs/contributors) who participated in this project.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
