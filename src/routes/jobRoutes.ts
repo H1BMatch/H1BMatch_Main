@@ -1,7 +1,6 @@
 
 import express, { Request, Response } from 'express';
 import { getJobsBySimilarity,getAppliedJobs } from '../services/jobService';
-import { getJobsBySimilarity,getAppliedJobs } from '../services/jobService';
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 
 const jobRoutes = express.Router();
