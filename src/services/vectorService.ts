@@ -12,11 +12,11 @@ export async function generateEmbedding(text: string): Promise<number[]> {
       input: text,
     });
 
-    console.log("Response:", response.data);
-
+    console.log("Response:", response);
     if (response.status !== 200) {
       throw new Error(`API returned status code ${response.status}`);
     }
+    
 
     const embeddings = response.data.embeddings;
     console.log("Embeddings:", embeddings);
@@ -24,7 +24,6 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     if (!Array.isArray(embeddings) || !Array.isArray(embeddings[0])) {
       throw new Error("Invalid embedding format received from LLaMA3 API.");
     }
-
     // Flatten the embeddings array
     const embedding = embeddings.flat();
     console.log("Flattened Embedding:", embedding);

@@ -27,6 +27,10 @@ export const updateResume = async (id: string, resumeData: any) => {
                     WHERE clerk_user_id = $3 
                     RETURNING *`;
     const result = await pool.query(query, [resume, formattedVector, id]);
+    const updateDateQuery = `UPDATE users 
+                 SET resume_uploaded_date = NOW() 
+                 WHERE clerk_user_id = $1`;
+    await pool.query(updateDateQuery, [id]);
     const updatedResume = result.rows[0];
     return updatedResume;
   } catch (error) {

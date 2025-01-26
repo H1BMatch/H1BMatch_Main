@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   ClerkExpressRequireAuth,
 } from "@clerk/clerk-sdk-node";
+import { ok } from "assert";
 
 const userRoutes = express.Router();
 
@@ -22,6 +23,7 @@ userRoutes.get(
   ClerkExpressRequireAuth(),
   async (req, res: Response) => {
     try {
+      console.log("Inside user routes");
       const user = await userService.getClerkId(req.auth.userId ?? '');
       res.status(200).json(user);
     } catch (error) {
@@ -87,8 +89,6 @@ userRoutes.post(
   }
 );
 
-
-
 //get the user profile information
 userRoutes.get('/profile',ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
   try {
@@ -101,6 +101,104 @@ userRoutes.get('/profile',ClerkExpressRequireAuth(), async (req: Request, res: R
     res.status(500).json({ message: "Error fetching user", error });
   }
  });
+
+
+// update the user Bio
+
+userRoutes.post('/update-bio', ClerkExpressRequireAuth(), async (req: Request, res: Response) => { 
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const bio: string = req.body.bio;
+    const updatedBio = await userService.updateUserBio(user, bio);
+    if (!updatedBio) {
+      return res.status(500).json({ message: "Error updating bio" });
+    }
+    res.status(200).json(updatedBio);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating bio", error });
+  }  
+});
+// routes to update the about section
+
+userRoutes.post('/update-about', ClerkExpressRequireAuth(), async (req: Request, res: Response) => { 
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const about: string = req.body.about;
+    const updatedAbout = await userService.updateUserAbout(user, about);
+    if (!updatedAbout) {
+      return res.status(500).json({ message: "Error updating about section" });
+    }
+    res.status(200).json(updatedAbout);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating bio", error });
+  }  
+});
+
+userRoutes.post('/update-title', ClerkExpressRequireAuth(), async (req: Request, res: Response) => { 
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const title: string = req.body.jobTitle;
+    const updatedTitle = await userService.updateUserTitle(user, title);
+    if (!updatedTitle) {
+      return res.status(500).json({ message: "Error updating title" });
+    }
+    res.status(200).json(updatedTitle);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating title", error });
+  }  
+});
+
+userRoutes.post('/update-location', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const location: string = req.body.location;
+    const updatedLocation = await userService.updateUserLocation(user, location);
+    if (!updatedLocation) {
+      return res.status(500).json({ message: "Error updating location" });
+    }
+    res.status(200).json(updatedLocation);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating location", error });
+  }  
+});  
+
+userRoutes.post('/update-skills', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const skills: string[] = req.body.skills;
+    const updatedSkills = await userService.updateUserSkills(user, skills);
+    if (!updatedSkills) {
+      return res.status(500).json({ message: "Error updating skills" });
+    }
+    res.status(200).json(updatedSkills);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating skills", error });
+  }  
+});
+userRoutes.post('/applied-jobs', ClerkExpressRequireAuth(), async (req: Request, res: Response) => {
+  console.log("Inside applied jobs");
+  try {
+    // user id form the auth object is the clerk id
+    const user: string = req.auth.userId ?? '';
+    const jobId: string = req.body.jobId;
+    const appliedDate: string = req.body.appliedDate;
+    console.log("Applied date and user id and job id is ", appliedDate, user, jobId);
+    const appliedJobs = await userService.updateAppliedJobs(user, jobId, appliedDate);
+    console.log("Applied jobs is ");
+    if (!appliedJobs) {
+      return res.status(500).json({ message: "Error updating applied jobs" });
+    }
+    res.status(200).json({ok: "ok"});
+  } catch (error) {
+    res.status(500).json({ message: "Error updating applied jobs", error });
+  }  
+});
+
 
 export default userRoutes;
 

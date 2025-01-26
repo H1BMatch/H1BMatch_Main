@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import pool from '../utils/RDSConnection'; 
 import { generateEmbedding } from '../services/vectorService'; 
-import { IJob } from '../models/Job'; 
+import { IJob } from '../models/job'; 
 import cron from 'node-cron';
 import pgvector from 'pgvector'; 
 

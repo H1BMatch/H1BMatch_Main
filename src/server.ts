@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
-import { getCompanyData } from "../src/services/companyService";
+import { getCompanyData } from "./services/companyService";
 import jobRoutes from "./routes/jobRoutes";
 import userRoutes from "./routes/userRoutes";
 import resumeRoutes from "./routes/resumeRoutes";
@@ -19,16 +19,20 @@ declare global {
   }
 }
 const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173",
+  "http://localhost:8080",
+  //"http://localhost:5173",
+  "https://h1bbackend.azurewebsites.net",//production backend url
+  "https://h1bmatch.azurewebsites.net",//production front end url
+  "https://appjob.net"
 ];
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    console.log("The origin is" + origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("Not allowed by CORS. Please check the origin."));
     }
   },
   credentials: true,
@@ -39,7 +43,6 @@ app.use(cors(corsOptions));
 app.use(ClerkExpressWithAuth());
 app.set("json spaces", 2);
 app.use(express.json());
-app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
@@ -77,3 +80,5 @@ app.get("/api/company", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+

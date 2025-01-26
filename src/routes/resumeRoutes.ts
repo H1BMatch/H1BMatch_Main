@@ -33,11 +33,15 @@ resumeRoutes.post(
   async (req: Request, res: Response) => {
     try {
       const vectorizedText = await generateEmbedding(req.body.resume); 
-
+      console.log("Vectorized text: ", vectorizedText);
       const updatedResume = await resumeService.updateResume(req.auth.userId ?? '', {
         ...req.body,
         vectorizedText,
       });
+      
+
+      
+
       res.status(200).json(updatedResume);
     } catch (error) {
       res.status(500).json({ message: "Error updating resume", error });
